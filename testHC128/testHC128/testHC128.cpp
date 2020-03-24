@@ -4,6 +4,7 @@
 #include <iostream>
 #include "hc128.h"
 #include <Windows.h>
+#include "CHC128Crypto.h"
 
 #pragma comment(lib ,"Ws2_32.lib")
 
@@ -181,35 +182,55 @@ void decrypt(uint8_t* data, int len, uint8_t* out)
 	if (hc128_set_key_and_iv(&ctx, (uint8_t*)key, 16, (const uint8_t*)iv, 16)) {
 		return;
 	}
+
+	//unsigned long* pData = (unsigned long*)data;
+	//for (int i = 0; i < len / 4; i++)
+	//{
+	//	pData[i] = htonl(pData[i]);
+	//}
 	hc128_crypt(&ctx, data, len, out);
+	//pData = (DWORD*)out;
+	//for (int i = 0; i < len / 4; i++)
+	//{
+	//	pData[i] = htonl(pData[i]);
+	//}
+
 }
 
-void decrypt1(struct hc128_context* ctx, uint8_t* data, int len, uint8_t* out)
-{
-	hc128_crypt(ctx, data, len, out);
-}
+
 
 int main()
 {
-	struct hc128_context sndCtx;
-	struct hc128_context rcvCtx;
-	uint8_t key[16] = { 0x42,0x5B,0x29,0xFD,0xB7,0x53,0xC5,5,0x83,0x77,0xE8,0xA,0x50,0x17,0x80,0x75 };
-	uint8_t iv[16] = { 0xDE, 0xAD, 0x45, 0xC1, 0x2A, 0xC8, 0x93, 0xCE, 0xAA,0, 0xBF, 0xB6, 0x7B, 0x40, 0x19, 0xA7 };
-
-	if (hc128_set_key_and_iv(&sndCtx, (uint8_t*)key, 16, (const uint8_t*)iv, 16)) {
-		return;
-	}
-
-	if (hc128_set_key_and_iv(&rcvCtx, (uint8_t*)key, 16, (const uint8_t*)iv, 16)) {
-		return;
-	}
-
 	uint8_t out[1024];
-	//decrypt(data_3_0_r, sizeof(data_3_0_r), out);
-	//decrypt(data_3_1_r, sizeof(data_3_1_r), out);
+	//decrypt(data_0_0, sizeof(data_0_0), out);
+	//decrypt(data_0_1, sizeof(data_0_1), out);
 
-	decrypt1(&rcvCtx, data_3_0_r, sizeof(data_3_0_r), out);
-	decrypt1(&rcvCtx, data_3_1_r, sizeof(data_3_1_r), out);
-	decrypt1(&rcvCtx, data_3_2_r, sizeof(data_3_2_r), out);
+	//decrypt(data_1_0, sizeof(data_1_0), out);
+	//decrypt(data_1_1, sizeof(data_1_1), out);
+	//
+
+	//decrypt(data_2_0, sizeof(data_2_0), out);
+	//decrypt(data_2_1, sizeof(data_2_1), out);
+	//decrypt(data_3_0, sizeof(data_3_0), out);
+	//decrypt(data_3_1, sizeof(data_3_1), out);
+
+	CHC128Crypto crypto;
+	crypto.init();
+
+	crypto.decryptForSend(data_3_0_s, sizeof(data_3_0_s), out);
+	crypto.decryptForRcv(data_3_0_r, sizeof(data_3_0_r), out);
+
+	crypto.decryptForSend(data_3_1_s, sizeof(data_3_1_s), out);
+	
+
+	crypto.decryptForRcv(data_3_1_r, sizeof(data_3_1_r), out);
+	crypto.decryptForRcv(data_3_2_r, sizeof(data_3_2_r), out);
+	
+
+	crypto.decryptForSend(data_3_2_s, sizeof(data_3_2_s), out);
+	crypto.decryptForSend(data_3_3_s, sizeof(data_3_3_s), out);
+
+	crypto.decryptForRcv(data_3_3_r, sizeof(data_3_3_r), out);
+
 }
 
